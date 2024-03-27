@@ -1,0 +1,59 @@
+service: api-tts
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.9
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - polly:SynthesizeSpeech
+            - dynamodb:*
+            - s3:*
+          Resource:
+            - "*"
+            #- arn:aws:dynamodb:*:*:table/your-table-name  # Replace with your table ARN
+            - "arn:aws:s3:::generatedaudiopolly2"
+
+  deploymentBucket:
+    blockPublicAccess: false
+
+functions:
+  health:
+    handler: handler.health
+    events:
+      - httpApi:
+          path: /
+          method: get
+  v1Description:
+    handler: handler.v1_description
+    events:
+      - httpApi:
+          path: /v1
+          method: get
+  v1TTSDescription:
+    handler: handler.lambda_generate_audio
+    events:
+      - httpApi:
+          path: /v1/tts
+          method: post
+  v2Description:
+    handler: handler.v2_description
+    events:
+      - httpApi:
+          path: /v2
+          method: get
+
+resources:
+  Resources:
+    MyS3Bucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: generatedaudiopolly2
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: true
+          BlockPublicPolicy: true
+          IgnorePublicAcls: true
+          RestrictPublicBuckets: true
