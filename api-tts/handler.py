@@ -1,6 +1,7 @@
 import json
 import boto3
 import uuid
+import datetime
 
 client = boto3.client('polly')
 s3 = boto3.client('s3')
@@ -55,10 +56,16 @@ def lambda_generate_audio(event, context):
     
     # Montar o URL do objeto no bucket S3
     audio_url = f"https://generatedaudiopolly2.s3.amazonaws.com/{file_name}"
+
+    body = {
+                "received_phrase": phrase,
+                "url_to_audio": audio_url,
+                "created_audio": datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+            }
     
     return {
         'statusCode': 200,
-        'body': audio_url
+        'body': json.dumps(body)
     }
 
     
