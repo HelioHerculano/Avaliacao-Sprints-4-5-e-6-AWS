@@ -60,7 +60,7 @@ def lambda_generate_audio(event, context):
     body = {
                 "received_phrase": phrase,
                 "url_to_audio": audio_url,
-                "created_audio": datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+                "created_audio": datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
             }
     
     return {
